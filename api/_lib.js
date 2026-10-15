@@ -7,9 +7,16 @@ const base=req=>env('BASE_URL').replace(/\/+$/,'')||'https://'+(req.headers['x-f
 let tok={v:null,e:0};
 async function token(){
   if(tok.v&&Date.now()<tok.e)return tok.v;
-  const r=await fetch('https://osu.ppy.sh/oauth/token',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({client_id:+ID,client_secret:SEC,grant_type:'client_credentials',scope:'public'})}).then(r=>r.json());
-  if(!r.access_token)throw new Error('osu token: '+JSON.stringify(r)+' (secretLen='+SEC.length+')');
-  tok={v:r.access_token,e:Date.now()+(r.expires_in-60)*1000};return tok.v;
+  if(!ID||!SEC)throw new Error('Set OSU_CLIENT_ID and OSU_CLIENT_SECRET in the environment or .env file.');
+  const response=await fetch('https://osu.ppy.sh/oauth/token',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({client_id:+ID,client_secret:SEC,grant_type:'client_credentials',scope:'public'})});
+  const body=await response.text();
+  let data;
+  try{data=JSON.parse(body)}catch{throw new Error(`osu! OAuth returned invalid JSON (HTTP ${response.status})`)}
+  if(!response.ok||!data.access_token){
+    if(data.error==='invalid_client')throw new Error('osu! rejected the OAuth client. Check OSU_CLIENT_ID and OSU_CLIENT_SECRET.');
+    throw new Error(`osu! OAuth token request failed (HTTP ${response.status})`);
+  }
+  tok={v:data.access_token,e:Date.now()+(data.expires_in-60)*1000};return tok.v;
 }
 async function osu(path,opt={}){
   const r=await fetch('https://osu.ppy.sh/api/v2'+path,{...opt,headers:{Authorization:'Bearer '+await token(),'Content-Type':'application/json',Accept:'application/json'}});

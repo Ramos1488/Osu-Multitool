@@ -4,6 +4,9 @@ countries().then(list=>{
   sel.innerHTML=`<option value="">${t('world')}</option>`+list.map(c=>`<option value="${esc(c.code)}">${flag(c.code)} ${esc(c.name)}</option>`).join('');
   if(qs.get('c'))sel.value=qs.get('c');
   rk();
+}).catch(error=>{
+  sel.innerHTML=`<option value="">${t('world')}</option>`;
+  $('#rt').innerHTML=`<tr><td class="dim">${esc(error.message||String(error))}</td></tr>`;
 });
 document.querySelectorAll('.seg button').forEach(button=>button.onclick=()=>{
   document.querySelectorAll('.seg button').forEach(item=>item.classList.remove('on'));

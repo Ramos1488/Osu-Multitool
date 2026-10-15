@@ -99,7 +99,11 @@ module.exports=async(req,res)=>{
       }
       default:return res.status(400).json({error:'bad action'});
     }
-  }catch(e){return res.status(500).json({error:String(e)})}
+  }catch(e){
+    const error=String(e);
+    const status=/Set OSU_CLIENT_ID|rejected the OAuth client/.test(error)?503:500;
+    return res.status(status).json({error});
+  }
   res.setHeader('Cache-Control',q.a==='countries'?'s-maxage=86400':q.a==='top_scores'?'s-maxage=30, stale-while-revalidate=60':'s-maxage=5, stale-while-revalidate=30');
   res.json(d);
 };

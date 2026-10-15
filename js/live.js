@@ -6,7 +6,7 @@ $('#feed').innerHTML=liveHead;
 $('#top-feed').innerHTML=topHead;
 countries().then(list=>{
   countrySelect.innerHTML=`<option value="">${t('worldwide')}</option>`+list.map(item=>`<option value="${esc(item.code)}">${flag(item.code)} ${esc(item.name)}</option>`).join('');
-}).catch(error=>{$('#top-msg').textContent=String(error)});
+}).catch(error=>{$('#top-msg').textContent=`${t('scoreLoadError')} ${error.message||String(error)}`});
 period.onchange=loadTopScores;
 countrySelect.onchange=loadTopScores;
 function scoreUserCell(user,id){

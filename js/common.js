@@ -148,7 +148,7 @@ const flagImg=c=>c&&/^[a-z]{2}$/i.test(c)?`<img class="flag" src="https://osu.pp
 const countryName=c=>{if(!c||!/^[a-z]{2}$/i.test(c))return'';try{return new Intl.DisplayNames([language==='en'?'en':'ru'],{type:'region'}).of(c.toUpperCase())||c.toUpperCase()}catch{return c.toUpperCase()}};
 const mapCover=s=>s?.covers?.list||s?.covers?.['list@2x']||s?.covers?.cover||(s?.id||s?.beatmapset_id?`https://assets.ppy.sh/beatmaps/${encodeURIComponent(s.id||s.beatmapset_id)}/covers/list.jpg`:'');
 const image=(url,cls,alt='')=>url?`<img class="${cls}" src="${esc(url)}" alt="${esc(alt)}" loading="lazy">`:'';
-const countries=()=>api('osu?a=countries').then(d=>{const dn=new Intl.DisplayNames([language==='en'?'en':'ru'],{type:'region'});
+const countries=()=>api('osu?a=countries').then(d=>{if(d.error)throw new Error(d.error);const dn=new Intl.DisplayNames([language==='en'?'en':'ru'],{type:'region'});
   return (d.list||[]).filter(c=>c.code).map(c=>{let n;try{n=dn.of(c.code)}catch{}return{code:c.code,name:n&&n!==c.code?n:c.name}}).sort((a,b)=>a.name.localeCompare(b.name,language==='en'?'en':'ru'))});
 const PAGES=[['index','navLive'],['ranking','navRanking'],['calc','navPP'],['bpm','navBpm'],['maps','navMaps']];
 $('#nav').innerHTML=PAGES.map(([p,key])=>`<a href="${p==='index'?'/':p+'.html'}" class="${p===$('#nav').dataset.active?'on':''}">${t(key)}</a>`).join('');

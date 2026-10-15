@@ -14,7 +14,8 @@ async function ld(){
   }
   best=await api('osu?a=best&id='+encodeURIComponent(P.id));
   if(!Array.isArray(best)){
-    $('#pinfo').textContent=best?.error||t('failedLoad');return;
+    const error=best?.error;
+    P=null;best=[];rw=[];$('#pinfo').textContent=error||t('failedLoad');return;
   }
   const stats=P.statistics||{};
   const avgBpm=best.length
