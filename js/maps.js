@@ -6,8 +6,31 @@ const sp=B(a.speed_difficulty)*L*(1+arF*L)*h*(.95+od*od/750)*acc**((14.5-Math.ma
 const ba=Math.max(0,1-(1-acc)*n/nc),ac=1.52163**od*ba**24*2.83*Math.min(1.15,(nc/1000)**.3)*(hd?1.08:1);
 return 1.14*(aim**1.1+sp**1.1+ac**1.1)**(1/1.1)}
 let sets=[];
-$('#ms').onclick=async()=>{const d=await api('osu?a=search&q='+encodeURIComponent($('#mq').value));sets=d.beatmapsets||[];
-$('#ml').innerHTML=sets.slice(0,15).map((s,i)=>`<div class="card map-card"><span class="cover">${image(mapCover(s),'beatmap-cover',s.title||'Обложка карты')}</span><div><b>${esc(s.artist)} — ${esc(s.title)}</b><div class="dim">${esc(s.creator||'')} · ${s.play_count?f(s.play_count)+' прохождений':''}</div><div class="row" style="margin:10px 0 0">`+s.beatmaps.filter(b=>b.mode==='osu').map(b=>`<button data-s="${i}" data-b="${b.id}">${esc(b.version)} · ${f(b.difficulty_rating,2)}★</button>`).join(' ')+'</div></div></div>').join('')};
-$('#ml').onclick=async e=>{const b=e.target.dataset.b;if(!b)return;const m=sets[e.target.dataset.s].beatmaps.find(x=>x.id==b);$('#mres').textContent='Считаю…';
-const MODS=['','HD','HR','DT','HDDT','HDHR'],ACC=[95,98,99,100],A=await Promise.all(MODS.map(x=>api(`osu?a=attr&id=${b}&mods=${x}`)));
-$('#mres').innerHTML=`<div class="prof">${image(mapCover(sets[e.target.dataset.s]),'team-image','Обложка карты')}<div><b>${esc(m.version)}</b><div class="dim">BPM ${f(m.bpm)} · ${f(m.difficulty_rating,2)}★ · приближённый расчёт PP, фулл-комбо</div></div></div><table><tr><th>Моды${ACC.map(a=>`<th>${a}%`).join('')}</tr>`+MODS.map((x,i)=>`<tr><td>${x||'NM'}`+(A[i].attributes?ACC.map(a=>`<td>${f(pp(A[i].attributes,m,a,x.includes('HD')))}`).join(''):'<td colspan="4">—')+'</tr>').join('')+'</table>'};
+$('#ms').onclick=async()=>{
+  const query=$('#mq').value.trim();
+  if(!query){$('#ml').innerHTML=`<div class="card dim">${t('mapSearch')}</div>`;return}
+  $('#ml').innerHTML=`<div class="card dim">${t('loadingMaps')}</div>`;
+  const d=await api('osu?a=search&q='+encodeURIComponent(query));
+  if(d.error){sets=[];$('#ml').innerHTML=`<div class="card dim">${esc(d.error||t('mapsError'))}</div>`;return}
+  sets=Array.isArray(d.beatmapsets)?d.beatmapsets:[];
+  if(!sets.length){$('#ml').innerHTML=`<div class="card dim">${t('noMaps')}</div>`;return}
+  $('#ml').innerHTML=sets.slice(0,15).map((set,i)=>{
+    const beatmaps=Array.isArray(set.beatmaps)?set.beatmaps.filter(map=>map.mode==='osu'):[];
+    return `<div class="card map-card"><span class="cover">${image(mapCover(set),'beatmap-cover',set.title||t('cover'))}</span><div><b>${esc(set.artist||'')} — ${esc(set.title||'')}</b><div class="dim">${esc(set.creator||'')}</div><div class="row" style="margin:10px 0 0">${beatmaps.map(map=>`<button data-s="${i}" data-b="${encodeURIComponent(map.id)}">${esc(map.version||t('difficulty'))} · ${f(map.difficulty_rating,2)}★</button>`).join(' ')}</div></div></div>`;
+  }).join('');
+};
+$('#ml').onclick=async e=>{
+  const button=e.target.closest('button[data-b]');
+  if(!button)return;
+  const set=sets[Number(button.dataset.s)],map=set?.beatmaps?.find(item=>String(item.id)===decodeURIComponent(button.dataset.b));
+  if(!map){$('#mres').textContent=t('mapLoadError');return}
+  $('#mres').textContent=t('calculating');
+  const MODS=['','HD','HR','DT','HDDT','HDHR'],ACC=[95,98,99,100];
+  const attributes=await Promise.all(MODS.map(mod=>api(`osu?a=attr&id=${encodeURIComponent(map.id)}&mods=${mod}`)));
+  if(attributes.some(result=>result.error||!result.attributes)){
+    $('#mres').textContent=t('mapLoadError');return;
+  }
+  const header=`<tr><th>${t('mods')}${ACC.map(acc=>`<th>${acc}%`).join('')}</tr>`;
+  const rows=MODS.map((mod,i)=>`<tr><td>${mod||'NM'}`+ACC.map(acc=>`<td>${f(pp(attributes[i].attributes,map,acc,mod.includes('HD')))}`).join('')+'</tr>').join('');
+  $('#mres').innerHTML=`<div class="prof">${image(mapCover(set),'team-image',t('cover'))}<div><b>${esc(map.version||t('difficulty'))}</b><div class="dim">${t('bpm')} ${f(map.bpm)} · ${f(map.difficulty_rating,2)}★ · ${t('approxPP')}</div></div></div><div class="table-scroll"><table>${header}${rows}</table></div>`;
+};

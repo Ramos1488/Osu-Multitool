@@ -13,7 +13,11 @@ async function token(){
 }
 async function osu(path,opt={}){
   const r=await fetch('https://osu.ppy.sh/api/v2'+path,{...opt,headers:{Authorization:'Bearer '+await token(),'Content-Type':'application/json',Accept:'application/json'}});
-  return r.json();
+  const body=await r.text();
+  let data;
+  try{data=JSON.parse(body)}catch{throw new Error(`osu! API returned invalid JSON (HTTP ${r.status})`)}
+  if(!r.ok)throw new Error(data.error||`osu! API request failed (HTTP ${r.status})`);
+  return data;
 }
 const sign=s=>crypto.createHmac('sha256',SS).update(s).digest('base64url');
 const makeSession=o=>{const b=Buffer.from(JSON.stringify(o)).toString('base64url');return b+'.'+sign(b)};
@@ -24,6 +28,6 @@ const readSession=req=>{
 };
 const sb=async(path,opt={})=>{
   if(!SBURL||!SBKEY)return null;
-  try{return await fetch(SBURL+'/rest/v1/'+path,{...opt,headers:{apikey:SBKEY,Authorization:'Bearer '+SBKEY,'Content-Type':'application/json',...(opt.headers||{})}})}catch{return null}
+  return fetch(SBURL+'/rest/v1/'+path,{...opt,headers:{apikey:SBKEY,Authorization:'Bearer '+SBKEY,'Content-Type':'application/json',...(opt.headers||{})}});
 };
-module.exports={osu,makeSession,readSession,sb,base,ID,SEC,SS,SBURL};
+module.exports={osu,makeSession,readSession,sb,base,ID,SEC,SS,SBURL,SBKEY};
