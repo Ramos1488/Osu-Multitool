@@ -1,5 +1,6 @@
 # Osu!Multitool
 Live scores, rankings, PP calculators, BPM test, map PP with mods. Static HTML/CSS/JS + Vercel serverless (`api/`) + Supabase.
+Player avatars, country flags, beatmap covers and team images are displayed from osu! API data and osu!'s image hosts.
 
 ## Setup
 1. Run `schema.sql` in Supabase.

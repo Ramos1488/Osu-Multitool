@@ -1,7 +1,11 @@
 const $=s=>document.querySelector(s),api=p=>fetch('/api/'+p).then(r=>r.json()).catch(e=>({error:String(e)})),f=(n,d=0)=>(+n).toLocaleString('ru',{maximumFractionDigits:d});
 const mn=x=>x.acronym||x,tot=l=>l.reduce((s,p,i)=>s+p*.95**i,0),desc=(a,b)=>b-a;
 const bpmMul=m=>m.some(x=>/DT|NC/.test(mn(x)))?1.5:m.some(x=>/HT|DC/.test(mn(x)))?.75:1;
+const esc=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const flag=c=>c&&c.length===2?String.fromCodePoint(...[...c.toUpperCase()].map(x=>127397+x.charCodeAt())):'';
+const flagImg=c=>c&&/^[a-z]{2}$/i.test(c)?`<img class="flag" src="https://osu.ppy.sh/images/flags/${c.toUpperCase()}.png" alt="${esc(c)}" loading="lazy">`:'';
+const mapCover=s=>s?.covers?.list||s?.covers?.['list@2x']||s?.covers?.cover||'';
+const image=(url,cls,alt='')=>url?`<img class="${cls}" src="${esc(url)}" alt="${esc(alt)}" loading="lazy">`:'';
 const countries=()=>api('osu?a=countries').then(d=>{const dn=new Intl.DisplayNames(['ru'],{type:'region'});
   return (d.list||[]).filter(c=>c.code).map(c=>{let n;try{n=dn.of(c.code)}catch{}return{code:c.code,name:n&&n!==c.code?n:c.name}}).sort((a,b)=>a.name.localeCompare(b.name,'ru'))});
 const PAGES=[['index','Live'],['ranking','Рейтинг'],['calc','PP'],['bpm','BPM тест'],['maps','Карты']];
