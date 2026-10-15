@@ -1,6 +1,6 @@
-<!doctype html><html lang="ru"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>BPM тест · Osu!Multitool</title><link rel="stylesheet" href="css/style.css">
-<header><b>Osu!<i>Multitool</i></b><nav id="nav" data-active="bpm"></nav><form id="hs"><input placeholder="Поиск игрока"></form><span id="login"></span></header>
+<!doctype html><html lang="ru"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#0d0d12"><title data-i18n="titleBpm">BPM тест · osu!multitool</title><link rel="icon" type="image/svg+xml" href="assets/om-mark.svg"><link rel="stylesheet" href="css/style.css">
+<header><a class="brand" href="/" aria-label="osu!multitool — главная" data-i18n-aria="homeLabel"><img src="assets/om-mark.svg" alt=""><span><strong>osu!</strong><i>multitool</i></span></a><nav id="nav" data-active="bpm"></nav><form id="hs"><input placeholder="Поиск игрока" aria-label="Поиск игрока" data-i18n-placeholder="searchPlayer"></form><span id="login"></span></header>
 <main>
-<h2>BPM тест</h2><div class="card"><div class="row"><select id="kn"><option>1<option selected>2<option>3<option>4</select><button id="ks">Выбрать клавиши</button><b id="kl" style="align-self:center">Z + X</b></div>
-<p class="dim">Нажми свою клавишу — тест стартует на 10 секунд. BPM = нажатия/сек × 15 (1/4 бита).</p><div id="bv" class="big">0</div><p id="bres"></p></div>
-</main><script src="js/common.js"></script><script src="js/bpm.js"></script></html>
+<section class="page-intro"><h2 data-i18n="bpmTestTitle">BPM тест</h2><p data-i18n="bpmTestDesc">Проверь скорость нажатий и сравни её со своим привычным темпом.</p></section><div class="card"><div class="row"><select id="kn" aria-label="Количество клавиш"><option>1<option selected>2<option>3<option>4</select><button id="ks" data-i18n="chooseKeys">Выбрать клавиши</button><b id="kl" style="align-self:center">Z + X</b></div>
+<p class="dim" data-i18n="bpmHelp">Нажми свою клавишу — тест стартует на 10 секунд. BPM = нажатия/сек × 15 (1/4 бита).</p><div id="bv" class="big">0</div><p id="bres"></p></div>
+</main><footer><span>o!m · osu!multitool</span><span data-i18n="footerData">Данные и изображения — osu!</span></footer><script src="js/common.js"></script><script src="js/bpm.js"></script></html>
