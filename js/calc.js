@@ -1,6 +1,5 @@
 let P,best=[],rw=[];
-const bpmMul=m=>m.some(x=>/DT|NC/.test(mn(x)))?1.5:m.some(x=>/HT|DC/.test(mn(x)))?.75:1;
-authReady.then(s=>{if(s){$('#uname').value=s.u;ld()}});
+authReady.then(s=>{const u=new URLSearchParams(location.search).get('u')||(s&&s.u);if(u){$('#uname').value=u;ld()}});
 async function ld(){const u=$('#uname').value.trim();if(!u)return;P=await api('osu?a=user&u='+encodeURIComponent(u));
 if(!P.id)return $('#pinfo').textContent='Игрок не найден';best=await api('osu?a=best&id='+P.id);const s=P.statistics;
 const bpm=best.reduce((a,x)=>a+x.beatmap.bpm*bpmMul(x.mods||[]),0)/best.length;

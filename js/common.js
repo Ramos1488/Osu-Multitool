@@ -1,6 +1,11 @@
-const $=s=>document.querySelector(s),api=p=>fetch('/api/'+p).then(r=>r.json()),f=(n,d=0)=>(+n).toLocaleString('ru',{maximumFractionDigits:d});
+const $=s=>document.querySelector(s),api=p=>fetch('/api/'+p).then(r=>r.json()).catch(e=>({error:String(e)})),f=(n,d=0)=>(+n).toLocaleString('ru',{maximumFractionDigits:d});
 const mn=x=>x.acronym||x,tot=l=>l.reduce((s,p,i)=>s+p*.95**i,0),desc=(a,b)=>b-a;
+const bpmMul=m=>m.some(x=>/DT|NC/.test(mn(x)))?1.5:m.some(x=>/HT|DC/.test(mn(x)))?.75:1;
+const flag=c=>c&&c.length===2?String.fromCodePoint(...[...c.toUpperCase()].map(x=>127397+x.charCodeAt())):'';
+const countries=()=>api('osu?a=countries').then(d=>{const dn=new Intl.DisplayNames(['ru'],{type:'region'});
+  return (d.list||[]).filter(c=>c.code).map(c=>{let n;try{n=dn.of(c.code)}catch{}return{code:c.code,name:n&&n!==c.code?n:c.name}}).sort((a,b)=>a.name.localeCompare(b.name,'ru'))});
 const PAGES=[['index','Live'],['ranking','Рейтинг'],['calc','PP'],['bpm','BPM тест'],['maps','Карты']];
 $('#nav').innerHTML=PAGES.map(([p,t])=>`<a href="${p==='index'?'/':p+'.html'}" class="${p===$('#nav').dataset.active?'on':''}">${t}</a>`).join('');
+$('#hs').onsubmit=e=>{e.preventDefault();const v=$('#hs input').value.trim();if(v)location='profile.html?u='+encodeURIComponent(v)};
 let me;
-const authReady=api('auth').then(s=>{me=s;$('#login').innerHTML=s?`${s.u} · <a href="/api/auth?a=logout">выйти</a>`:'<a href="/api/auth?a=login">Войти через osu!</a>';return s});
+const authReady=api('auth').then(s=>{me=s&&!s.error?s:null;$('#login').innerHTML=me?`<a href="profile.html?id=${me.id}">${me.u}</a> · <a href="/api/auth?a=logout" class="dim">выйти</a>`:'<a href="/api/auth?a=login">Войти через osu!</a>';return me});
